@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-speedometer2"></i> Hasil Analisis Data</h2>
+            <div>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-arrow-left"></i> Kembali ke Upload
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-secondary">
+                    <i class="bi bi-printer"></i> Cetak
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not data and not analysis %}
+<!-- Tampilan ketika tidak ada data -->
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                <h3 class="mt-3">Tidak Ada Data untuk Ditampilkan</h3>
+                <p class="text-muted">Silakan upload file CSV atau TXT terlebih dahulu.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-cloud-upload"></i> Upload File
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if data and charts %}
+<!-- Tampilan untuk data CSV -->
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> 
+            <strong>File CSV berhasil diproses!</strong> Data ditampilkan dalam bentuk visualisasi grafik dan tabel.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Tren Inflasi dan Suku Bunga</h5>
+                <span class="badge bg-light text-dark">{{ data.dates|length }} data points</span>
+            </div>
+            <div class="card-body">
+                {% if charts.trend_chart %}
+                    <img src="data:image/png;base64,{{ charts.trend_chart }}" class="img-fluid" 
+                         alt="Grafik Tren Inflasi dan Suku Bunga" style="width: 100%; height: auto;">
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-bar-chart" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Data tidak tersedia untuk grafik tren</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">
+                    Grafik menunjukkan perkembangan inflasi dan suku bunga selama periode terpantau.
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Cadangan Devisa dan Transaksi</h5>
+                <span class="badge bg-light text-dark">{{ data.dates|length }} data points</span>
+            </div>
+            <div class="card-body">
+                {% if charts.bar_chart %}
+                    <img src="data:image/png;base64,{{ charts.bar_chart }}" class="img-fluid" 
+                         alt="Grafik Cadangan Devisa dan Transaksi" style="width: 100%; height: auto;">
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-bar-chart" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Data tidak tersedia untuk grafik batang</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">
+                    Grafik perbandingan cadangan devisa dan volume transaksi (dalam skala yang disesuaikan).
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Data Mentah</h5>
+                <span class="badge bg-light text-dark">{{ data.dates|length }} records</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Periode</th>
+                                <th>Inflasi (%)</th>
+                                <th>Suku Bunga (%)</th>
+                                <th>Cadangan Devisa</th>
+                                <th>Transaksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(data.dates|length) %}
+                            <tr>
+                                <td>{{ data.dates[i] }}</td>
+                                <td>
+                                    {% if i < data.inflation|length and data.inflation[i] != 0.0 %}
+                                        {{ data.inflation[i] }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if i < data.interest_rates|length and data.interest_rates[i] != 0.0 %}
+                                        {{ data.interest_rates[i] }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if i < data.foreign_reserves|length and data.foreign_reserves[i] != 0.0 %}
+                                        {{ data.foreign_reserves[i] }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if i < data.transactions|length and data.transactions[i] != 0.0 %}
+                                        {{ data.transactions[i] }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif analysis and text_content %}
+<!-- Tampilan untuk analisis teks -->
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle"></i> 
+            <strong>File TXT berhasil dianalisis!</strong> Hasil analisis AI ditampilkan di bawah.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-robot"></i> Hasil Analisis AI</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-chat-quote"></i> 
+                    <strong>Prompt yang digunakan:</strong> "Ringkas dan jelaskan isi laporan ini secara singkat untuk manajemen Bank Indonesia. Berikan ringkasan 3-5 kalimat dan insight penting atau rekomendasi."
+                </div>
+                
+                <div class="analysis-content bg-light p-4 rounded">
+                    <h6 class="border-bottom pb-2">Ringkasan dan Insight:</h6>
+                    <div class="mt-3">
+                        {{ analysis | replace('\n', '<br>') | safe }}
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="border-bottom pb-2">Detail Analisis:</h6>
+                    <div class="row mt-3">
+                        <div class="col-sm-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-clock"></i> Waktu Analisis</h6>
+                                    <p class="mb-0">{{ now }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-file-text"></i> Panjang Teks</h6>
+                                    <p class="mb-0">{{ text_content | wordcount }} kata</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Teks Laporan Asli</h5>
+            </div>
+            <div class="card-body">
+                <div class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                    <pre class="mb-0 small">{{ text_content }}</pre>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">
+                    Teks asli yang dianalisis oleh AI. Scroll untuk melihat lebih banyak.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- JavaScript untuk dashboard -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fungsi untuk mengatur tinggi grafik agar konsisten
+    function setChartHeights() {
+        const chartImages = document.querySelectorAll('.card-body img.img-fluid');
+        if (chartImages.length > 0) {
+            // Cari tinggi maksimum dari semua grafik
+            let maxHeight = 0;
+            chartImages.forEach(img => {
+                if (img.height > maxHeight) {
+                    maxHeight = img.height;
+                }
+            });
+            
+            // Terapkan tinggi yang sama ke semua grafik
+            chartImages.forEach(img => {
+                img.style.height = maxHeight + 'px';
+            });
+        }
+    }
+    
+    // Jalankan setelah gambar dimuat
+    window.addEventListener('load', setChartHeights);
+    
+    // Juga jalankan setelah delay untuk memastikan
+    setTimeout(setChartHeights, 1000);
+    
+    // Tooltip untuk elemen interaktif
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Home — Analisis Data Ekonomi{% endblock %}
+
+
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-7">
+<div class="card shadow-sm h-100">
+<div class="card-body">
+<h5 class="card-title mb-3"><i class="bi bi-upload me-2"></i>Upload File</h5>
+<p class="text-muted small">Format File : <code>.csv</code> untuk data, <code>.txt</code> untuk laporan teks.</p>
+<form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+<div class="mb-3">
+<label for="file" class="form-label">Pilih File</label>
+<input class="form-control" type="file" id="file" name="file" accept=".csv,.txt" required />
+<div class="invalid-feedback">Silakan pilih file .CSV atau .TXT</div>
+</div>
+<div class="d-flex gap-2">
+<button class="btn btn-primary" type="submit"><i class="bi bi-cloud-arrow-up me-1"></i>Upload</button>
+<a class="btn btn-outline-secondary" href="#" data-bs-toggle="collapse" data-bs-target="#sampleCollapse"><i class="bi bi-filetype-csv me-1"></i>Lihat Contoh CSV</a>
+</div>
+</form>
+
+
+<div id="sampleCollapse" class="collapse mt-3">
+<pre class="bg-light p-3 border rounded small mb-0"><code>tanggal,inflasi,suku_bunga,cadangan_devisa,transaksi
+2025-01,3.1,5.0,135000,25000
+2025-02,3.4,5.0,136200,27000
+2025-03,3.6,5.25,137800,29000
+2025-04,3.5,5.25,139000,31000
+2025-05,3.2,5.0,140500,28000
+2025-06,3.0,4.75,141200,26000
+2025-07,2.9,4.75,142000,30000
+2025-08,3.1,5.0,143500,32000
+2025-09,3.3,5.0,144800,33000
+2025-10,3.5,5.25,146000,35000</code></pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="col-lg-5">
+<div class="card shadow-sm h-100">
+<div class="card-body">
+<h5 class="card-title mb-3"><i class="bi bi-info-square me-2"></i>Panduan Singkat</h5>
+<ol class="small mb-0">
+<li>Siapkan file CSV dengan kolom: <em>tanggal</em>, <em>inflasi</em>, <em>suku_bunga</em>, <em>cadangan_devisa</em>, <em>transaksi</em>.</li>
+<li>Atau file TXT berisi laporan yang ingin diringkas.</li>
+<li>Klik <strong>Upload</strong> dan tunggu hasil ditampilkan di dashboard.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
